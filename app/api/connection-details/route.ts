@@ -12,21 +12,19 @@ export type ConnectionDetails = {
   roomName: string;
   participantName: string;
   participantToken: string;
+  resumeId?: string; // Optional resume ID if uploaded
 };
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    if (LIVEKIT_URL === undefined) {
-      throw new Error("LIVEKIT_URL is not defined");
-    }
-    if (API_KEY === undefined) {
-      throw new Error("LIVEKIT_API_KEY is not defined");
-    }
-    if (API_SECRET === undefined) {
-      throw new Error("LIVEKIT_API_SECRET is not defined");
+    if (!LIVEKIT_URL || !API_KEY || !API_SECRET) {
+      throw new Error("Missing LiveKit environment variables");
     }
 
-  
+    // Extract resumeId from query params
+    const { searchParams } = new URL(req.url);
+    const resumeId = searchParams.get("resumeId") ?? undefined;
+
     const participantIdentity = `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
     const roomName = `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`;
     const participantToken = await createParticipantToken(
@@ -37,18 +35,19 @@ export async function GET() {
     const data: ConnectionDetails = {
       serverUrl: LIVEKIT_URL,
       roomName,
-      participantToken: participantToken,
       participantName: participantIdentity,
+      participantToken,
+      resumeId, // include resume ID if available
     };
-    const headers = new Headers({
-      "Cache-Control": "no-store",
+
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "no-store",
+      },
     });
-    return NextResponse.json(data, { headers });
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(error);
-      return new NextResponse(error.message, { status: 500 });
-    }
+    console.error("Error in GET /connection-details:", error);
+    return new NextResponse((error as Error).message, { status: 500 });
   }
 }
 
@@ -57,6 +56,7 @@ function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) 
     ...userInfo,
     ttl: "15m",
   });
+
   const grant: VideoGrant = {
     room: roomName,
     roomJoin: true,
@@ -64,6 +64,7 @@ function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) 
     canPublishData: true,
     canSubscribe: true,
   };
+
   at.addGrant(grant);
   return at.toJwt();
 }

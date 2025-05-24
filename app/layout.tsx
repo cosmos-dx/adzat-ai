@@ -25,9 +25,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        {children}
+        <nav className="w-full bg-[#1a1a1a] p-4 rounded-md shadow-lg flex items-center justify-between">
+          <div className="text-lg font-bold text-white">Adzat.io Interview</div>
+          <ul className="flex space-x-6">
+            <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Home</a></li>
+            <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">About</a></li>
+            <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div className="flex-1 flex flex-col items-center justify-center bg-[#0e0e0e] text-white px-4">
+          {children}
+        </div>
+
+        <footer className="w-full bg-[#1a1a1a] p-3 text-center text-gray-400 text-sm rounded-md shadow-lg">
+          © {new Date().getFullYear()} Adzat.io. All rights reserved. Licensing information available upon request.
+        </footer>
       </body>
     </html>
   );
