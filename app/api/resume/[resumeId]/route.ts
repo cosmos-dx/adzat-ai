@@ -6,7 +6,7 @@ export async function GET(
   req: Request,
   context: { params: { resumeId: string } }
 ) {
-  const { resumeId } = context.params;
+  const resumeId = context.params.resumeId;
 
   try {
     const filePath = path.join('/tmp', `resume-${resumeId}.txt`);
