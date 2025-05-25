@@ -2,11 +2,12 @@ import { useEffect, useRef } from "react";
 
 export function CandidateVideoFeed() {
   const videoRef = useRef<HTMLVideoElement>(null);
-
+  const videoStreamRef = useRef<MediaStream | null>(null);
   useEffect(() => {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoStreamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -17,6 +18,13 @@ export function CandidateVideoFeed() {
     };
 
     startCamera();
+    return () => {
+      console.log("Cleaning up video stream");
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach(track => track.stop());
+        videoStreamRef.current = null;
+      }
+    }
   }, []);
 
   return (
