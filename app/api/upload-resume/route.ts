@@ -11,6 +11,7 @@ export const POST = async (req: Request) => {
     if (!file || file.type !== 'application/pdf') {
       return NextResponse.json({ error: 'Invalid or missing PDF file' }, { status: 400 });
     }
+
     const forwardFormData = new FormData();
     forwardFormData.append('resume', file);
 
@@ -26,23 +27,25 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ error: `Flask API error: ${errorJson.error || 'Unknown error'}` }, { status: 500 });
     }
 
+    // Get resumeId & parsedText from Flask API response
     const { resumeId, parsedText } = await flaskResponse.json();
 
     if (!parsedText) {
       return NextResponse.json({ error: 'No parsed text received from Flask API' }, { status: 500 });
     }
 
+    // Save parsed text locally
     const savePath = path.join('/tmp', `resume-${resumeId}.txt`);
     await writeFile(savePath, parsedText, 'utf-8');
 
     return NextResponse.json({
-      message: 'Resume parsed and uploaded via Flask API',
+      message: 'Resume parsed and uploaded successfully',
       resumeId,
       textLength: parsedText.length,
       parsedText,
     });
   } catch (error) {
-    console.error('Error in Next.js upload handler:', error);
+    console.error('Error in upload-resume:', error);
     return NextResponse.json({ error: 'Failed to upload and parse resume' }, { status: 500 });
   }
 };
