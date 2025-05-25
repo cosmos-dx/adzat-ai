@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import path from 'path';
 import { readFile } from 'fs/promises';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(req: Request, { params }: { params: { resumeId: string } }) {
+  const { resumeId } = params;
 
   try {
     const filePath = path.join('/tmp', `resume-${id}.txt`);
