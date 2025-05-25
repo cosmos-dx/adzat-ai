@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import TranscriptionView from "@/components/TranscriptionView";
-import { CandidateVideoFeed } from "@/components/CandidateVideoFeed"; 
+import { CandidateVideoFeed } from "@/components/CandidateVideoFeed";
 import type { ConnectionDetails } from "./api/connection-details/route";
 import "./voiceOverrides.css";
 
@@ -22,19 +22,28 @@ export default function Page() {
   const [room] = useState(() => new Room());
 
   const onConnectButtonClicked = useCallback(async () => {
-    const url = new URL(
-      process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? "/api/connection-details",
-      window.location.origin
-    );
-    if (resumeId) {
-      url.searchParams.set("resumeId", resumeId);
+    try {
+      const url = new URL(
+        process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? "/api/connection-details",
+        window.location.origin
+      );
+      if (resumeId) {
+        url.searchParams.set("resumeId", resumeId);
+      }
+
+      const response = await fetch(url.toString());
+      if (!response.ok) {
+        throw new Error("Failed to fetch connection details");
+      }
+
+      const connectionDetailsData: ConnectionDetails = await response.json();
+
+      await room.connect(connectionDetailsData.serverUrl, connectionDetailsData.participantToken);
+      await room.localParticipant.setMicrophoneEnabled(true);
+    } catch (error) {
+      console.error("Connection error:", error);
+      alert("Failed to connect to the interview room.");
     }
-
-    const response = await fetch(url.toString());
-    const connectionDetailsData: ConnectionDetails = await response.json();
-
-    await room.connect(connectionDetailsData.serverUrl, connectionDetailsData.participantToken);
-    await room.localParticipant.setMicrophoneEnabled(true);
   }, [room, resumeId]);
 
   useEffect(() => {
@@ -124,20 +133,28 @@ function SimpleVoiceAssistant({
             transition={{ duration: 0.3 }}
             className="grid items-center justify-center h-full gap-6"
           >
-            <div className="flex flex-col items-center  gap-2">
+            <div className="flex flex-col items-center gap-2">
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
                 className="text-black bg-white rounded-md hover:cursor-pointer px-2 py-1"
               />
-              <button onClick={handleUpload} className="uppercase px-4 py-2 bg-green-500 hover:cursor-pointer text-white rounded-md">
+              <button
+                onClick={handleUpload}
+                className="uppercase px-4 py-2 bg-green-500 hover:cursor-pointer text-white rounded-md"
+              >
                 Upload Resume
               </button>
               {uploadStatus && <p className="text-sm text-yellow-400">{uploadStatus}</p>}
             </div>
 
-            <button className="uppercase px-4 py-2 bg-white text-black rounded-md hover:cursor-pointer" onClick={onConnectButtonClicked}>
+            <button
+              className="uppercase px-4 py-2 bg-white text-black rounded-md hover:cursor-pointer"
+              onClick={onConnectButtonClicked}
+              disabled={!resumeFile}
+              title={!resumeFile ? "Please upload a resume first" : ""}
+            >
               Start Interview
             </button>
           </motion.div>
@@ -150,8 +167,6 @@ function SimpleVoiceAssistant({
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center gap-4 h-full flex-1"
           >
-           
-
             <div className="flex items-center justify-evenly gap-2 w-full flex-1">
               <img
                 src="/ai-image.png"
@@ -168,14 +183,9 @@ function SimpleVoiceAssistant({
             </div>
             <RoomAudioRenderer />
             <NoAgentNotification state={agentState ?? "disconnected"} />
-
-           
           </motion.div>
-          
         )}
-        
       </AnimatePresence>
-       
     </>
   );
 }
