@@ -1,5 +1,7 @@
 import { AccessToken, AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
+import path from "path";
+import { readFile } from "fs/promises";
 
 const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
@@ -12,7 +14,8 @@ export type ConnectionDetails = {
   roomName: string;
   participantName: string;
   participantToken: string;
-  resumeId?: string; // Optional resume ID if uploaded
+  resumeId?: string;
+  resumeText?: string;
 };
 
 export async function GET(req: Request) {
@@ -21,7 +24,6 @@ export async function GET(req: Request) {
       throw new Error("Missing LiveKit environment variables");
     }
 
-    // Extract resumeId from query params
     const { searchParams } = new URL(req.url);
     const resumeId = searchParams.get("resumeId") ?? undefined;
 
@@ -32,12 +34,23 @@ export async function GET(req: Request) {
       roomName
     );
 
+    let resumeText: string | undefined = undefined;
+    if (resumeId) {
+      try {
+        const filePath = path.join("/tmp", `resume-${resumeId}.txt`);
+        resumeText = await readFile(filePath, "utf-8");
+      } catch {
+        console.warn(`Resume file not found for resumeId=${resumeId}`);
+      }
+    }
+
     const data: ConnectionDetails = {
       serverUrl: LIVEKIT_URL,
       roomName,
       participantName: participantIdentity,
       participantToken,
-      resumeId, // include resume ID if available
+      resumeId,
+      resumeText,
     };
 
     return NextResponse.json(data, {
@@ -46,13 +59,13 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error in GET /connection-details:", error);
+    console.error("Error in connection-details:", error);
     return new NextResponse((error as Error).message, { status: 500 });
   }
 }
 
 function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) {
-  const at = new AccessToken(API_KEY, API_SECRET, {
+  const at = new AccessToken(API_KEY!, API_SECRET!, {
     ...userInfo,
     ttl: "15m",
   });
