@@ -28,8 +28,13 @@ export function CandidateVideoFeed() {
   }, []);
 
   return (
-    <div className="rounded-xl overflow-hidden w-[256px] h-[256px] bg-black shadow-lg">
-      <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+    <div className="rounded-lg overflow-hidden w-[256px] h-[256px] bg-white shadow-lg flex flex-col">
+      <div className="text-indigo-600 font-bold py-2 text-center border-b border-gray-100">
+        You
+      </div>
+      <div className="flex-1 bg-black">
+        <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+      </div>
     </div>
   );
 }

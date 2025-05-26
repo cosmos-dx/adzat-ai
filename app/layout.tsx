@@ -23,25 +23,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen h-full m-0`}
       >
-        <nav className="w-full bg-[#1a1a1a] p-4 rounded-md shadow-lg flex items-center justify-between">
-          <div className="text-lg font-bold text-white">Adzat.io Interview</div>
+        <nav className="w-full bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-10">
+          <div className="text-lg font-bold text-indigo-600">Adzat.io Interview</div>
           <ul className="flex space-x-6">
-            <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Home</a></li>
-            <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">About</a></li>
-            <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Contact</a></li>
+            <li><a href="/" className="text-gray-600 hover:text-indigo-600 transition-colors duration-200">Home</a></li>
+            <li><a href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors duration-200">About</a></li>
+            <li><a href="/contact" className="text-gray-600 hover:text-indigo-600 transition-colors duration-200">Contact</a></li>
           </ul>
         </nav>
 
-        <div className="flex-1 flex flex-col items-center justify-center bg-[#0e0e0e] text-white px-4">
+        <main className="flex-grow flex flex-col bg-gradient-to-b from-gray-100 to-gray-200 py-8">
           {children}
-        </div>
+        </main>
 
-        <footer className="w-full bg-[#1a1a1a] p-3 text-center text-gray-400 text-sm rounded-md shadow-lg">
-          © {new Date().getFullYear()} Adzat.io. All rights reserved. Licensing information available upon request.
+        <footer className="w-full bg-white p-3 text-center text-gray-500 text-sm shadow-sm relative z-10">
+          © {new Date().getFullYear()} Adzat.io. All rights reserved.
         </footer>
       </body>
     </html>

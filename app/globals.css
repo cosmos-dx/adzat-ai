@@ -3,9 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -19,6 +16,20 @@
   }
 }
 
+html {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
 
 .agent-visualizer > .lk-audio-bar {
   width: 100%;
@@ -33,9 +44,29 @@
   @apply h-[36px] hover:bg-[#6b221a] hover:text-white bg-[#31100c] border-[#6b221a];
 }
 
+.visualizer-bar {
+  animation: barPulse 1.2s ease-in-out infinite;
+  transform-origin: bottom;
+  transition: background-color 0.3s ease, height 0.5s ease;
+}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.bg-indigo-600.visualizer-bar {
+  animation-duration: 1s; 
+}
+
+.bg-green-500.visualizer-bar {
+  animation-duration: 0.7s; 
+}
+
+.bg-amber-500.visualizer-bar {
+  animation-duration: 1.5s; 
+}
+
+@keyframes barPulse {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
