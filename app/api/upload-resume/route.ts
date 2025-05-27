@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises';
-import { v4 as uuid } from 'uuid';
 import path from 'path';
 import { NextResponse } from 'next/server';
+import os from 'os';
 
 export const POST = async (req: Request) => {
   try {
@@ -24,18 +24,16 @@ export const POST = async (req: Request) => {
 
     if (!flaskResponse.ok) {
       const errorJson = await flaskResponse.json();
-      return NextResponse.json({ error: `Flask API error: ${errorJson.error || 'Unknown error'}` }, { status: 500 });
+      return NextResponse.json({ error: `Flask API error: ${errorJson.error ?? 'Unknown error'}` }, { status: 500 });
     }
 
-    // Get resumeId & parsedText from Flask API response
     const { resumeId, parsedText } = await flaskResponse.json();
 
     if (!parsedText) {
       return NextResponse.json({ error: 'No parsed text received from Flask API' }, { status: 500 });
     }
 
-    // Save parsed text locally
-    const savePath = path.join('/tmp', `resume-${resumeId}.txt`);
+    const savePath = path.join(os.tmpdir(), `resume-${resumeId}.txt`);
     await writeFile(savePath, parsedText, 'utf-8');
 
     return NextResponse.json({
