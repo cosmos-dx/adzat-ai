@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.27.0",
     "@livekit/components-react": "^2.9.3",
     "@livekit/components-styles": "^1.1.4",
     "framer-motion": "^11.18.0",

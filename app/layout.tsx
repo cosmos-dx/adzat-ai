@@ -29,11 +29,11 @@ export default function RootLayout({
       >
         <nav className="w-full bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-10">
           <div className="text-lg font-bold text-indigo-600">Adzat.io Interview</div>
-          <ul className="flex space-x-6">
+          {/* <ul className="flex space-x-6">
             <li><a href="/" className="text-gray-600 hover:text-indigo-600 transition-colors duration-200">Home</a></li>
             <li><a href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors duration-200">About</a></li>
             <li><a href="/contact" className="text-gray-600 hover:text-indigo-600 transition-colors duration-200">Contact</a></li>
-          </ul>
+          </ul> */}
         </nav>
 
         <main className="flex-grow flex flex-col bg-gradient-to-b from-gray-100 to-gray-200 py-8">

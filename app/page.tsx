@@ -85,41 +85,68 @@ function CustomBarVisualizer({ agentState }: Readonly<{ agentState: AgentState |
         return 'Interview in progress';
     }
   };
-  
+
   const getBarClassName = () => {
     switch (agentState) {
       case 'speaking':
-        return 'bg-indigo-600'; 
+        return 'bg-indigo-600';
       case 'listening':
-        return 'bg-green-500'; 
+        return 'bg-green-500';
       case 'thinking':
-        return 'bg-amber-500'; 
+        return 'bg-amber-500';
       default:
-        return 'bg-gray-400'; 
+        return 'bg-gray-400';
     }
   };
-  
+
   const isActive = agentState === 'speaking' || agentState === 'listening' || agentState === 'thinking';
-  
+
   return (
     <div className="rounded-lg overflow-hidden w-[256px] h-[256px] bg-white shadow-lg flex flex-col">
       <div className="text-indigo-600 font-bold py-2 text-center border-b border-gray-100">
         AI Interviewer
       </div>
       <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-        <div className="flex items-end justify-center space-x-1 h-[128px] w-full">
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((barId) => (
-            <div 
-              key={`visualizer-bar-${barId}`}
-              className={`${getBarClassName()} w-3 rounded-t-md ${isActive ? 'visualizer-bar' : 'h-4'}`}
-              style={{
-                height: isActive ? `${20 + Math.random() * 80}%` : '10%', 
-                animationDelay: `${barId * 0.1}s`,
-                opacity: isActive ? 1 : 0.5
-              }}
-            />
-          ))}
-        </div>
+        {agentState === 'listening' ? (
+          <div className="relative w-32 h-32">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full border-4 border-green-500 animate-pulse" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full border-4 border-green-500 animate-pulse" style={{ animationDelay: '0.2s' }} />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 rounded-full border-4 border-green-500 animate-pulse" style={{ animationDelay: '0.4s' }} />
+            </div>
+          </div>
+        ) : agentState === 'speaking' || agentState === 'thinking' ? (
+          <div className="flex items-end justify-center space-x-1 h-[128px] w-full">
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((barId) => (
+              <div
+                key={`visualizer-bar-${barId}`}
+                className={`${getBarClassName()} w-3 rounded-t-md transition-all duration-300 ease-in-out`}
+                style={{
+                  height: `${20 + Math.random() * 80}%`,
+                  animation: `visualizer-animation-${barId} 1s ease-in-out infinite`,
+                  animationDelay: `${barId * 0.1}s`,
+                  opacity: 1
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-end justify-center space-x-1 h-[128px] w-full">
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((barId) => (
+              <div
+                key={`visualizer-bar-${barId}`}
+                className={`${getBarClassName()} w-3 rounded-t-md h-4`}
+                style={{
+                  opacity: 0.5
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <div className="text-gray-600 text-sm text-center py-2 border-t border-gray-100">
         {getStatusText()}
@@ -219,7 +246,7 @@ function SimpleVoiceAssistant({
             <div className="flex justify-center mb-6">
               <div className="text-indigo-600 text-3xl font-bold">Adzat.io Interview</div>
             </div>
-            
+
             <div className="flex flex-col items-center gap-6 mb-6">
               <div className="w-full">
                 <p className="text-gray-600 mb-2 text-center">Upload your resume to begin</p>
@@ -235,21 +262,21 @@ function SimpleVoiceAssistant({
                   </span>
                 </label>
               </div>
-              
+
               <button
                 onClick={handleUpload}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
               >
                 Upload Resume
               </button>
-              
+
               {uploadStatus && (
                 <p className={`text-sm ${uploadStatus.includes("success") ? "text-green-600" : "text-yellow-600"}`}>
                   {uploadStatus}
                 </p>
               )}
             </div>
-            
+
             <div className="pt-4 border-t border-gray-200">
               <button
                 className="w-full py-2 px-4 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium transition-colors"
@@ -260,7 +287,7 @@ function SimpleVoiceAssistant({
                 Start Interview
               </button>
             </div>
-            
+
             <div className="mt-6 text-center text-xs text-gray-500">
               By continuing, you agree to our Terms of Service
             </div>
@@ -282,12 +309,11 @@ function SimpleVoiceAssistant({
           <div className="flex-1 w-full max-w-[540px] mx-auto relative">
             <TranscriptionView />
             <div className="absolute right-3 bottom-3 flex items-center gap-2">
-              <button 
-                className={`${
-                  isMuted 
-                    ? 'bg-gray-600 hover:bg-gray-700' 
-                    : 'bg-indigo-600 hover:bg-indigo-700'
-                } text-white rounded-full p-2.5 transition-colors flex items-center justify-center`}
+              <button
+                className={`${isMuted
+                  ? 'bg-gray-600 hover:bg-gray-700'
+                  : 'bg-indigo-600 hover:bg-indigo-700'
+                  } text-white rounded-full p-2.5 transition-colors flex items-center justify-center`}
                 onClick={handleMicToggle}
                 title={isMuted ? "Unmute microphone" : "Mute microphone"}
                 aria-label={isMuted ? "Unmute microphone" : "Mute microphone"}
@@ -298,7 +324,7 @@ function SimpleVoiceAssistant({
                   <FaMicrophone size={20} />
                 )}
               </button>
-              <button 
+              <button
                 className="bg-red-500 hover:bg-red-600 text-white font-medium rounded-full px-4 py-2 text-sm transition-colors flex items-center"
                 onClick={handleDisconnect}
                 aria-label="Disconnect call"
@@ -316,4 +342,25 @@ function SimpleVoiceAssistant({
       )}
     </AnimatePresence>
   );
+}
+
+const styles = `
+  @keyframes visualizer-animation-0 { 0%, 100% { height: 20%; } 50% { height: 90%; } }
+  @keyframes visualizer-animation-1 { 0%, 100% { height: 30%; } 50% { height: 80%; } }
+  @keyframes visualizer-animation-2 { 0%, 100% { height: 40%; } 50% { height: 70%; } }
+  @keyframes visualizer-animation-3 { 0%, 100% { height: 50%; } 50% { height: 90%; } }
+  @keyframes visualizer-animation-4 { 0%, 100% { height: 60%; } 50% { height: 85%; } }
+  @keyframes visualizer-animation-5 { 0%, 100% { height: 70%; } 50% { height: 95%; } }
+  @keyframes visualizer-animation-6 { 0%, 100% { height: 60%; } 50% { height: 85%; } }
+  @keyframes visualizer-animation-7 { 0%, 100% { height: 50%; } 50% { height: 90%; } }
+  @keyframes visualizer-animation-8 { 0%, 100% { height: 40%; } 50% { height: 70%; } }
+  @keyframes visualizer-animation-9 { 0%, 100% { height: 30%; } 50% { height: 80%; } }
+  @keyframes visualizer-animation-10 { 0%, 100% { height: 20%; } 50% { height: 90%; } }
+  @keyframes visualizer-animation-11 { 0%, 100% { height: 25%; } 50% { height: 85%; } }
+`;
+
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = styles;
+  document.head.appendChild(styleSheet);
 }
