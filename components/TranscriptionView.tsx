@@ -9,6 +9,19 @@ export default function TranscriptionView() {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
+    console.log(combinedTranscriptions);
+    // Save to localStorage
+    if (combinedTranscriptions.length > 0) {
+      console.log("Saving transcriptions to localStorage");
+      try {
+        localStorage.setItem(
+          "interview_transcriptions",
+          JSON.stringify(combinedTranscriptions)
+        );
+      } catch (e) {
+        console.error("Failed to save transcriptions to localStorage", e);
+      }
+    }
   }, [combinedTranscriptions]);
 
   return (

@@ -165,6 +165,7 @@ function SimpleVoiceAssistant({
   const { state: agentStateRaw } = useVoiceAssistant();
   const { localParticipant } = useLocalParticipant();
   const [isMuted, setIsMuted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const agentState = agentStateRaw as AgentState | undefined;
 
@@ -185,7 +186,7 @@ function SimpleVoiceAssistant({
   }, [localParticipant, isMuted]);
 
   const handleDisconnect = () => {
-    window.location.reload();
+    window.location.href = '/interview/analysis';
   };
 
   useEffect(() => {
@@ -203,6 +204,7 @@ function SimpleVoiceAssistant({
   };
 
   const handleUpload = async () => {
+    setIsLoading(true);
     if (!resumeFile) {
       setUploadStatus("Please select a resume file first.");
       return;
@@ -229,6 +231,7 @@ function SimpleVoiceAssistant({
       console.error("Upload error:", error);
       setUploadStatus("Error uploading resume.");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -265,9 +268,10 @@ function SimpleVoiceAssistant({
 
               <button
                 onClick={handleUpload}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                className="w-full cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-progress"
+                disabled={isLoading}
               >
-                Upload Resume
+                {isLoading ? "Uploading..." : "Upload Resume"}
               </button>
 
               {uploadStatus && (
